@@ -1,0 +1,25 @@
+services:
+  web:
+    build: .
+    container_name: student-web
+    ports:
+      - "5000:5000"
+    environment:
+      MONGO_URI: mongodb://database:27017
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: mongo:6
+    container_name: student-database
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mongo-data:
